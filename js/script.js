@@ -41,23 +41,38 @@ function loop(circle, elem, OnOff, i, max, time) {
     }
 }
 
+var attrName = 'data-file';
+
+function getFileName(element) {
+    var filename = element.getAttribute(attrName);
+    var url = "../data/Devices.LightsAndAutomation.LightPoint.";
+    url += filename;
+    url += ".xml";
+
+    return url;
+}
+
 function simulate() {
-    $.ajax({
-        type: "GET",
-        url: "../data/Devices.LightsAndAutomation.LightPoint.1.2.xml",
-        dataType: "xml",
-        success: function (xml) {
-            var $OnOff = $(xml).find("OnOff");
-            var elem = $("#someElement");
-            elem.append('[');
-            elem.append($OnOff.length);
-            elem.append(']');
-            var circle = $('#room1');
-            var time = 200;
-            if (circle != null) {
-                var numOfIter = Math.min(100, $OnOff.length);
-                loop(circle, elem, $OnOff, 0, numOfIter, time);
+    var td = $("td[" + attrName + "]");
+    $.each(td, function (idx, element) {
+        var filename = getFileName(element);
+        $.ajax({
+            type: "GET",
+            url: filename,
+            dataType: "xml",
+            success: function (xml) {
+                var $OnOff = $(xml).find("OnOff");
+                var elem = $("#someElement");
+                elem.append('[');
+                elem.append($OnOff.length);
+                elem.append(']');
+                var img = $(element).find('img');
+                if (img != null) {
+                    var time = 200;
+                    var numOfIter = Math.min(50, $OnOff.length);
+                    loop(img, elem, $OnOff, 0, numOfIter, time);
+                }
             }
-        }
+        });
     });
 }
