@@ -1,0 +1,12 @@
+table {
+    table-layout: auto;
+    border-collapse: collapse;
+}
+
+td {
+    border: 1px solid black;
+}
+
+img {
+    display: block;
+}
