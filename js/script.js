@@ -26,7 +26,7 @@ function loop(circle, elem, OnOff, i, max, time) {
 
         var val = OnOff[i].textContent;
         if (val == "null") {
-            circle.attr('src', '../icons/LightOff.png');
+            circle.attr('src', '../icons/QuestionMark.png');
         } else if (val == "0") {
             circle.attr('src', '../icons/LightOff.png');
         } else {
