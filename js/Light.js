@@ -70,13 +70,14 @@ Light.prototype.simulate = function () {
         dataType: "xml",
         success: function (xml) {
             light.OnOff = $(xml).find("OnOff");
+
             var elem = $("#someElement");
             elem.append('[');
             elem.append(light.OnOff.length);
             elem.append(']');
+
             if (light.image != null) {
                 var numOfIter = Math.min(50, light.OnOff.length);
-                // loop(img, elem, $OnOff, 0, numOfIter, time);
                 light.visualize(elem, 0, numOfIter);
             }
         }
