@@ -13,8 +13,9 @@ $(document).ready(function () {
 
 function simulate() {
     var td = $("td[" + attrName + "]");
+    var lights = [];
     $.each(td, function (idx, element) {
-        var light = new Light($(element).find('img'), element.getAttribute(attrName), $("#Time")[0]);
-        light.simulate();
+        lights.push(new Light($(element).find('img'), element.getAttribute(attrName), $("#Time")[0]));
+        lights[idx].simulate();
     });
 }

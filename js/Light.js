@@ -7,14 +7,15 @@ function Light(img, filename, timeElement) {
     this.image = img;
     this.timeElement = timeElement;
     this.OnOff = null;
+    this.OnOffPos = null;
 }
 
-Light.parseTime = function (str) {
+Light.prototype.timeToDate = function (str) {
     return new Date(str.substring(0, str.length - 3));
 };
 
 Light.time = 200; // ms
-Light.attributes = {'Time': Light.parseTime};
+Light.attributes = [new Attribute('Time', Light.prototype.timeToDate)];
 Light.fileNamePrefix = "../data/Devices.LightsAndAutomation.LightPoint.";
 Light.srcLightOff = '../icons/LightOff.png';
 Light.srcLightOn = '../icons/LightOn.png';
@@ -36,7 +37,7 @@ Light.prototype.visualize = function (elem, i, max) {
         $.each(atts, function (idx, value) {
             var func = Light.attributes[value.name];
             if (func != null) {
-                var date = func(value.nodeValue);
+                func(value.nodeValue);
             }
         });
 
@@ -58,6 +59,20 @@ Light.prototype.visualize = function (elem, i, max) {
     }
 };
 
+Light.prototype.updateIcon = function () {
+    var imgSrc = Light.srcQuestionMark;
+    if ((this.OnOff != null) && (this.OnOffPos != null) && (this.OnOffPos >= 0)) {
+        var elem = this.OnOff[this.OnOffPos];
+        var val = elem.textContent;
+        if (val == "0") {
+            imgSrc = Light.srcLightOff;
+        } else if (val == "1") {
+            imgSrc = Light.srcLightOn;
+        }
+    }
+    this.image.attr('src', imgSrc);
+};
+
 Light.prototype.simulate = function () {
     var light = this;
     $.ajax({
@@ -66,6 +81,9 @@ Light.prototype.simulate = function () {
         dataType: "xml",
         success: function (xml) {
             light.OnOff = $(xml).find("OnOff");
+            var currentTime = new Date(light.timeElement.textContent);
+            light.OnOffPos = Light.attributes[0].init(light.OnOff, currentTime);
+            light.updateIcon();
 
             var elem = $("#someElement");
             elem.append('[');
@@ -76,53 +94,6 @@ Light.prototype.simulate = function () {
              var numOfIter = Math.min(50, light.OnOff.length);
              light.visualize(elem, 0, numOfIter);
              }*/
-
-            if (light.image != null) {
-                var currentTime = new Date(light.timeElement.textContent);
-                var lastDate = null;
-                var flag = false;
-                $.each(light.OnOff, function (key, elem) {
-                    var atts = elem.attributes;
-                    $.each(atts, function (idx, value) {
-                        var func = Light.attributes[value.name];
-                        if (func != null) {
-                            var date = func(value.nodeValue);
-                            var imgSrc = Light.srcQuestionMark;
-                            if ((date > currentTime) && (lastDate != null)) {
-                                var val = elem.textContent;
-                                if (val == "0") {
-                                    imgSrc = Light.srcLightOff;
-                                } else if (val == "1") {
-                                    imgSrc = Light.srcLightOn;
-                                }
-                                light.image.attr('src', imgSrc);
-                                flag = true;
-                                return false;
-                            }
-                            light.image.attr('src', imgSrc);
-                            lastDate = date;
-                        }
-                    });
-                    if (flag == true) {
-                        return false;
-                    }
-                });
-            }
         }
     });
 };
-
-/*
- Light.parseTime = function (str) {
- var idx = str.indexOf(' ');
- date = null;
- time = null;
-
- if (idx >= 0) {
- var date = str.substring(0, idx);
- var time = str.substring(idx + 1, str.length);
- }
-
- return {date: date, time: time};
- };
- */
